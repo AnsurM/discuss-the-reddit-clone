@@ -23,4 +23,5 @@ export const {
       clientSecret: GITHUB_CLIENT_SECRET,
     }),
   ],
+  trustHost: true,
 });

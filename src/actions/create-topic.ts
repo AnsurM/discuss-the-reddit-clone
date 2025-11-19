@@ -3,7 +3,9 @@
 import { auth } from "@/auth";
 import { db } from "@/db";
 import paths from "@/path";
+import { Topic } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { z } from "zod";
 
@@ -50,15 +52,14 @@ export const createTopic = async (
     };
   }
 
+  let topic: Topic | null = null;
   try {
-    await db.topic.create({
+    topic = await db.topic.create({
       data: {
         slug: data.name,
         description: data.description,
       },
     });
-    revalidatePath(paths.home());
-    return { errors: {} };
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(error);
@@ -67,4 +68,7 @@ export const createTopic = async (
       errors: { _form: ["An unknown error occurred while creating the topic"] },
     };
   }
+
+  revalidatePath(paths.home());
+  redirect(paths.topicsShow(topic.slug));
 };

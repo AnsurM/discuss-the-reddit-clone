@@ -1,11 +1,12 @@
-"use server";
+// Authentication actions
+export { signIn } from "./sign-in";
+export { signOut } from "./sign-out";
 
-import { signIn as signInAction, signOut as signOutAction } from "@/auth";
+// Topic actions
+export { createTopic } from "./create-topic";
 
-export const signIn = async () => {
-  await signInAction("github");
-};
+// Post actions
+export { createPost } from "./create-post";
 
-export const signOut = async () => {
-  await signOutAction();
-};
+// Comment actions
+export { createComment } from "./create-comment";

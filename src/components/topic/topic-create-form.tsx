@@ -14,7 +14,7 @@ import { createTopic as createTopicAction } from "@/actions/create-topic";
 import { useActionState, startTransition } from "react";
 
 export default function TopicCreateForm() {
-  const [formState, formAction] = useActionState(createTopicAction, {
+  const [formState, formAction, isPending] = useActionState(createTopicAction, {
     errors: {},
   });
 
@@ -64,6 +64,7 @@ export default function TopicCreateForm() {
                 className="w-full"
                 isInvalid={!!nameErrors}
                 errorMessage={nameErrors}
+                disabled={isPending}
               />
               <Textarea
                 label="Topic Description"
@@ -73,6 +74,7 @@ export default function TopicCreateForm() {
                 className="w-full"
                 isInvalid={!!descriptionErrors}
                 errorMessage={descriptionErrors}
+                disabled={isPending}
               />
               {formErrors && <div className="text-red-500">{formErrors}</div>}
               <Button
@@ -80,6 +82,8 @@ export default function TopicCreateForm() {
                 color="success"
                 variant="flat"
                 className="w-full"
+                isLoading={isPending}
+                disabled={isPending}
               >
                 Create Topic
               </Button>

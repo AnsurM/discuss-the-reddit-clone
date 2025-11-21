@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Discuss Project
+
+This repository showcases advanced techniques and practices using Next.js. The project aims to exemplify modern web development using a variety of tools and libraries as detailed in `learnings.md`.
+
+## Project Objective
+
+The primary goal of this project is to craft a minimalistic version of Reddit where users have the capability to browse, post, and comment on topics and discussions. User authentication is handled exclusively through GitHub OAuth.
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running, follow these simple steps:
 
 ```bash
 npm run dev
-# or
+# alternate commands:
 yarn dev
-# or
 pnpm dev
-# or
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000) to interact with the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can jump straight into editing by modifying `app/page.tsx`. Live reloading is enabled for an efficient development experience.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Key Features
 
-## Learn More
+- **React & TypeScript**: Empowering modern development with seamless integration.
+- **Next.js & Caching Techniques**: Utilize innovative caching and streaming strategies to enhance app performance.
+- **Styling**: Aesthetic design realized with NextUI and TailwindCSS.
+- **Database Management**: PostgreSQL integration powered by Prisma ORM.
+- **Validation and Schema Enforcement**: Leveraging Zod for robust data validation.
 
-To learn more about Next.js, take a look at the following resources:
+## Additional Resources
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Explore further to enrich your understanding of the technologies used:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Learn Next.js](https://nextjs.org/learn)
+- [Next.js GitHub Repository](https://github.com/vercel/next.js)
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Easily deploy your application using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme), created by the Next.js team.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For comprehensive details on deployment options, refer to [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).

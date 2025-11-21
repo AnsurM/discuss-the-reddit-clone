@@ -1,5 +1,16 @@
-import type { Post } from '@prisma/client';
-import { db } from '@/db';
+import type { Post, Topic } from "@prisma/client";
+import { db } from "@/db";
+
+export type TopicWithDescription = Pick<Topic, "slug" | "description">;
+
+export function fetchTopicBySlug(
+  slug: string
+): Promise<TopicWithDescription | null> {
+  return db.topic.findUnique({
+    where: { slug },
+    select: { slug: true, description: true },
+  });
+}
 
 export type PostWithData = Post & {
   topic: { slug: string };
@@ -36,7 +47,7 @@ export function fetchTopPosts(): Promise<PostWithData[]> {
     orderBy: [
       {
         comments: {
-          _count: 'desc',
+          _count: "desc",
         },
       },
     ],

@@ -3,16 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "dotenv -e .env.local -- next dev",
+    "build": "prisma migrate deploy && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:migrate:local": "dotenv -e .env.local -- npx prisma migrate dev --schema=prisma/schema.prisma",
+    "prisma:generate:local": "dotenv -e .env.local -- npx prisma generate --schema=prisma/schema.prisma",
+    "postinstall": "prisma generate",
+    "start:db": "podman run --rm -p 5432:5432 -v discuss-postgres-data:/var/lib/postgresql/data -e POSTGRES_HOST_AUTH_METHOD=trust postgres:16",
+    "stop:db": "podman stop discuss-postgres-data"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",
     "@auth/prisma-adapter": "^2.7.4",
     "@nextui-org/react": "^2.6.11",
     "@prisma/client": "^6.2.1",
+    "dotenv-cli": "^11.0.0",
     "framer-motion": "^11.16.4",
     "next": "15.1.4",
     "next-auth": "^5.0.0-beta.25",

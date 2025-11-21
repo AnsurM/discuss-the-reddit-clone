@@ -1,87 +1,89 @@
 "use server";
 
-import { auth } from "@/auth";
-import { db } from "@/db";
-import paths from "@/path";
-import { Post } from "@prisma/client";
+import type { Post } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
 import { z } from "zod";
+import { auth } from "@/auth";
+import { db } from "@/db";
+import paths from "@/paths";
 
 const createPostSchema = z.object({
   title: z.string().min(3),
   content: z.string().min(10),
 });
 
-type CreatePostFormState = {
+interface CreatePostFormState {
   errors: {
-    _form?: string[];
     title?: string[];
     content?: string[];
+    _form?: string[];
   };
-};
+}
 
-export const createPost = async (
+export async function createPost(
   slug: string,
-  _prevState: CreatePostFormState,
+  formState: CreatePostFormState,
   formData: FormData
-): Promise<CreatePostFormState> => {
-  const title = formData.get("title");
-  const content = formData.get("content");
-
-  const { success, data, error } = createPostSchema.safeParse({
-    title,
-    content,
+): Promise<CreatePostFormState> {
+  const result = createPostSchema.safeParse({
+    title: formData.get("title"),
+    content: formData.get("content"),
   });
 
-  if (!success) {
+  if (!result.success) {
     return {
-      errors: error.flatten().fieldErrors as CreatePostFormState["errors"],
+      errors: result.error.flatten().fieldErrors,
     };
   }
 
   const session = await auth();
-  if (!session?.user || !session.user.id) {
+  if (!session || !session.user || !session.user.id) {
     return {
-      errors: { _form: ["You must be logged in to create a post"] },
+      errors: {
+        _form: ["You must be signed in to do this"],
+      },
     };
   }
 
-  const topic = await db.topic.findUnique({
+  const topic = await db.topic.findFirst({
     where: { slug },
   });
+
   if (!topic) {
     return {
-      errors: { _form: ["Topic not found"] },
+      errors: {
+        _form: ["Cannot find topic"],
+      },
     };
   }
 
-  let post: Post | null = null;
+  let post: Post;
   try {
     post = await db.post.create({
       data: {
-        title: data.title,
-        content: data.content,
+        title: result.data.title,
+        content: result.data.content,
         userId: session.user.id,
         topicId: topic.id,
       },
     });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(error);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return {
+        errors: {
+          _form: [err.message],
+        },
+      };
+    } else {
+      return {
+        errors: {
+          _form: ["Failed to create post"],
+        },
+      };
     }
-    return {
-      errors: { _form: ["An unknown error occurred while creating the post"] },
-    };
   }
 
-  if (post) {
-    revalidatePath(paths.topicsShow(slug));
-    redirect(paths.postShow(slug, post.id));
-  }
-
-  return {
-    errors: { _form: ["An unknown error occurred while creating the post"] },
-  };
-};
+  revalidatePath(paths.topicShow(slug));
+  redirect(paths.postShow(slug, post.id));
+}

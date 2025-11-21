@@ -1,28 +1,30 @@
+import Link from 'next/link';
+import { Suspense } from 'react';
 import {
-  Input,
-  Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
+import HeaderAuth from '@/components/header-auth';
+import SearchInput from '@/components/search-input';
 
-import paths from "@/path";
-import HeaderAuth from "./header-auth";
-
-export default async function Header() {
+export default function Header() {
   return (
     <Navbar className="shadow mb-6">
       <NavbarBrand>
-        <Link href={paths.home()} className="font-bold text-inherit">
+        <Link href="/" className="font-bold">
           Discuss
         </Link>
       </NavbarBrand>
       <NavbarContent justify="center">
         <NavbarItem>
-          <Input type="text" placeholder="Search topics" />
+          <Suspense>
+            <SearchInput />
+          </Suspense>
         </NavbarItem>
       </NavbarContent>
+
       <NavbarContent justify="end">
         <HeaderAuth />
       </NavbarContent>

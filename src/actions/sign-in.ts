@@ -1,7 +1,7 @@
-"use server";
+'use server';
 
-import { signIn as signInAction } from "@/auth";
+import * as auth from '@/auth';
 
-export const signIn = async () => {
-  await signInAction("github");
-};
+export async function signIn() {
+  return auth.signIn('github');
+}

@@ -1,74 +1,79 @@
 "use server";
 
-import { auth } from "@/auth";
-import { db } from "@/db";
-import paths from "@/path";
-import { Topic } from "@prisma/client";
+import type { Topic } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
 import { z } from "zod";
+import { auth } from "@/auth";
+import { db } from "@/db";
+import paths from "@/paths";
 
 const createTopicSchema = z.object({
   name: z
     .string()
     .min(3)
-    .regex(/^[a-z-]+$/, {
-      message: "Name must be in lowercase and hyphen separated without spaces",
+    .regex(/[a-z-]/, {
+      message: "Must be lowercase letters or dashes without spaces",
     }),
-  description: z.string().min(10).max(100),
+  description: z.string().min(10),
 });
 
-type CreateTopicFormState = {
+interface CreateTopicFormState {
   errors: {
-    _form?: string[];
     name?: string[];
     description?: string[];
+    _form?: string[];
   };
-};
+}
 
-export const createTopic = async (
-  _prevState: CreateTopicFormState,
+export async function createTopic(
+  formState: CreateTopicFormState,
   formData: FormData
-): Promise<CreateTopicFormState> => {
-  const name = formData.get("name");
-  const description = formData.get("description");
-
-  const { success, data, error } = createTopicSchema.safeParse({
-    name,
-    description,
+): Promise<CreateTopicFormState> {
+  const result = createTopicSchema.safeParse({
+    name: formData.get("name"),
+    description: formData.get("description"),
   });
 
-  if (!success) {
+  if (!result.success) {
     return {
-      errors: error.flatten().fieldErrors as CreateTopicFormState["errors"],
+      errors: result.error.flatten().fieldErrors,
     };
   }
 
   const session = await auth();
-  if (!session?.user) {
+  if (!session || !session.user) {
     return {
-      errors: { _form: ["You must be logged in to create a topic"] },
+      errors: {
+        _form: ["You must be signed in to do this."],
+      },
     };
   }
 
-  let topic: Topic | null = null;
+  let topic: Topic;
   try {
     topic = await db.topic.create({
       data: {
-        slug: data.name,
-        description: data.description,
+        slug: result.data.name,
+        description: result.data.description,
       },
     });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(error);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return {
+        errors: {
+          _form: [err.message],
+        },
+      };
+    } else {
+      return {
+        errors: {
+          _form: ["Something went wrong"],
+        },
+      };
     }
-    return {
-      errors: { _form: ["An unknown error occurred while creating the topic"] },
-    };
   }
 
-  revalidatePath(paths.home());
-  redirect(paths.topicsShow(topic.slug));
-};
+  revalidatePath("/");
+  redirect(paths.topicShow(topic.slug));
+}

@@ -1,51 +1,58 @@
 "use client";
 
 import {
+  NavbarItem,
   Button,
   Avatar,
-  NavbarItem,
+  Popover,
   PopoverTrigger,
   PopoverContent,
-  Popover,
 } from "@nextui-org/react";
-import { signIn as signInAction, signOut as signOutAction } from "@/actions";
-
 import { useSession } from "next-auth/react";
+import * as actions from "@/actions";
 
 export default function HeaderAuth() {
-  const { data: session, status } = useSession();
-  const isSessionLoading = status === "loading";
-  const isUserSignedIn = !isSessionLoading && !!session?.user;
+  const session = useSession();
 
-  if (isSessionLoading) {
-    return null;
+  let authContent: React.ReactNode;
+  if (session.status === "loading") {
+    authContent = null;
+  } else if (session.data?.user) {
+    authContent = (
+      <Popover placement="left">
+        <PopoverTrigger>
+          <Avatar src={session.data.user.image || ""} />
+        </PopoverTrigger>
+        <PopoverContent>
+          <div className="p-4">
+            <form action={actions.signOut}>
+              <Button type="submit">Sign Out</Button>
+            </form>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  } else {
+    authContent = (
+      <>
+        <NavbarItem>
+          <form action={actions.signIn}>
+            <Button type="submit" color="secondary" variant="bordered">
+              Sign In
+            </Button>
+          </form>
+        </NavbarItem>
+
+        <NavbarItem>
+          <form action={actions.signIn}>
+            <Button type="submit" color="primary" variant="flat">
+              Sign Up
+            </Button>
+          </form>
+        </NavbarItem>
+      </>
+    );
   }
-
-  const authContent = isUserSignedIn ? (
-    <Popover>
-      <PopoverTrigger>
-        <Avatar
-          src={session?.user?.image ?? undefined}
-          className="cursor-pointer"
-        />
-      </PopoverTrigger>
-      <PopoverContent className="p-4">
-        <form action={signOutAction}>
-          <Button type="submit" color="danger" variant="flat">
-            Sign Out
-          </Button>
-        </form>
-      </PopoverContent>
-    </Popover>
-  ) : (
-    <NavbarItem>
-      <form action={signInAction}>
-        <Button type="submit" color="primary" variant="flat">
-          Sign In
-        </Button>
-      </form>
-    </NavbarItem>
-  );
 
   return authContent;
 }
